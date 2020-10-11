@@ -1,0 +1,67 @@
+﻿<Window x:Class="DontSleepWPF.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DontSleepWPF"
+        mc:Ignorable="d"
+        Title="Don't Sleep" Height="150" Width="250" MinHeight="150" MinWidth="250"
+        ResizeMode="CanMinimize" MaxHeight="150" MaxWidth="250">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                       Text="Timeout:" Margin="21,0,0,0"/>
+            <TextBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"                     
+                     Text="{Binding Path=Timeout, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center"
+                       Text="s" Margin="5"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                      Content="Stop after:" Margin="1,0,0,0" 
+                      IsEnabled="{Binding Path=StopSwitcherAvailable, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <TextBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,3"
+                     Text="{Binding Path=StopTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <ComboBox Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5,4"                 
+                     Text="{Binding Path=StopTimeType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                       Text="Status:" Margin="21,0,0,0"/>
+            <Rectangle Grid.Column="1" Margin="2"
+                       Fill="{Binding Path=KeyPressorStatusColor, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" x:Name="StartBtn" Margin="5"
+                    Command="{Binding Path=StartCommand}" Content="Start"/>
+            <Button Grid.Column="2" x:Name="StopBtn" Margin="5"
+                    Command="{Binding Path=StopCommand}" Content="Stop"/>
+        </Grid>
+    </Grid>
+</Window>
