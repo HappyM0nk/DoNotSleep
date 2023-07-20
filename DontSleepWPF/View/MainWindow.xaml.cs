@@ -24,10 +24,5 @@ namespace DontSleepWPF.View
         {
             InitializeComponent();
         }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-
-        }
     }
 }

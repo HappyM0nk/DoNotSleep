@@ -17,14 +17,16 @@ namespace DontSleepWPF
 
         private bool _isStarted;
         private int _timeout;
+        private bool _isStopTimerStarted;
+        private DateTime _stopTime;
 
-        public event Action<Constants.TaskStatus> TaskStatusUpdated;
+        public event Action<Constants.KeyPressorStatus> TaskStatusUpdated;
 
         public KeyPressor(int timeout)
         {
             _timeout = timeout;
             _isStarted = false;
-            OnTaskStatusUpdated(Constants.TaskStatus.Stopped);
+            OnTaskStatusUpdated(Constants.KeyPressorStatus.Stopped);
         }
 
         public void Start()
@@ -35,11 +37,11 @@ namespace DontSleepWPF
             try
             {
                 var task = Task.Factory.StartNew(() => TaskProccess());
-                OnTaskStatusUpdated(Constants.TaskStatus.Runned);
+                OnTaskStatusUpdated(Constants.KeyPressorStatus.Runned);
             }
             catch (Exception e)
             {
-                OnTaskStatusUpdated(Constants.TaskStatus.Faulted);
+                OnTaskStatusUpdated(Constants.KeyPressorStatus.Faulted);
             }
         }
 
@@ -48,7 +50,7 @@ namespace DontSleepWPF
             if (!_isStarted)
                 return;
             _isStarted = false;
-            OnTaskStatusUpdated(Constants.TaskStatus.Stopped);
+            OnTaskStatusUpdated(Constants.KeyPressorStatus.Stopped);
         }
 
         public void UpdateTimeout(int timeout)
@@ -62,18 +64,75 @@ namespace DontSleepWPF
             {
                 while (_isStarted)
                 {
-                    keybd_event(VK_RCONTROL, 0, KEYEVENTF_EXTENDEDKEY, 0);
+                    //keybd_event(VK_RCONTROL, 0, KEYEVENTF_EXTENDEDKEY, 0);
                     keybd_event(VK_RCONTROL, 0, KEYEVENTF_KEYUP, 0);
                     Thread.Sleep(_timeout);
                 }
             }
             catch (Exception e)
             {
-                OnTaskStatusUpdated(Constants.TaskStatus.Faulted);
+                OnTaskStatusUpdated(Constants.KeyPressorStatus.Faulted);
             }
         }
 
-        private void OnTaskStatusUpdated(Constants.TaskStatus status)
+        public void StopAtTime(DateTime stopTime)
+        {
+            _stopTime = stopTime;
+
+            if (_isStopTimerStarted)
+                return;
+
+            if (DateTime.Now > _stopTime)
+            {
+                OnTaskStatusUpdated(Constants.KeyPressorStatus.StopTimerStopped);
+                return;
+            }
+
+            _isStopTimerStarted = true;
+            try
+            {
+                var task = Task.Factory.StartNew(() => StopTimerProccess());
+                OnTaskStatusUpdated(Constants.KeyPressorStatus.StopTimerStarted);
+            }
+            catch (Exception e)
+            {
+                OnTaskStatusUpdated(Constants.KeyPressorStatus.StopTimerStopped);
+            }
+        }
+
+        public void CancelStopTimer()
+        {
+            if (!_isStopTimerStarted)
+                return;
+            _isStarted = false;
+            OnTaskStatusUpdated(Constants.KeyPressorStatus.StopTimerStopped);
+        }
+
+        private void StopTimerProccess()
+        {
+            try
+            {
+                while (_isStopTimerStarted)
+                {
+                    if (DateTime.Now > _stopTime)
+                    {
+                        OnTaskStatusUpdated(Constants.KeyPressorStatus.StopTimerStopped);
+                        _isStopTimerStarted = false;
+                        Stop();
+                    }
+                    else
+                    {
+                        Thread.Sleep(600);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                OnTaskStatusUpdated(Constants.KeyPressorStatus.Faulted);
+            }
+        }
+
+        private void OnTaskStatusUpdated(Constants.KeyPressorStatus status)
         {
             TaskStatusUpdated?.Invoke(status);
         }

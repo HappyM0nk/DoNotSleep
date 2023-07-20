@@ -11,18 +11,19 @@ namespace DontSleepWPF
 {
     internal class AppSettings
     {
-        private static readonly string _filePath = "AppConfig.xml";
+        private static readonly string _filePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+            "DontSleep", 
+            "AppConfig.xml");
 
         internal static int Timeout;
-        internal static DateTime StopTime;
 
         internal static void Init()
         {
             Timeout = 180;
-            StopTime = DateTime.MinValue;
 
             if (!File.Exists(_filePath))
-            {               
+            {
                 Create();
                 return;
             }
@@ -47,20 +48,24 @@ namespace DontSleepWPF
                 {
                     xnode.InnerText = Timeout.ToString();
                 }
-                if (xnode.Name == "StopTime")
-                {
-                    xnode.InnerText = StopTime.ToShortTimeString();
-                }
             }
             xDoc.Save(_filePath);
         }
 
         private static void Create()
         {
+            var dir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "DontSleep");
+
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
             var xml = new XElement(
                     "AppSettings",
-                        new XElement("Timeout", Timeout.ToString()),
-                        new XElement("StopTime", StopTime.ToShortTimeString()));
+                        new XElement("Timeout", Timeout.ToString()));
             xml.Save(_filePath);
         }
 
@@ -74,10 +79,6 @@ namespace DontSleepWPF
                 if (xnode.Name == "Timeout")
                 {
                     int.TryParse(xnode.InnerText, out Timeout);
-                }
-                if (xnode.Name == "StopTime")
-                {
-                    DateTime.TryParse(xnode.InnerText, out StopTime);
                 }
             }
         }

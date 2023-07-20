@@ -11,7 +11,7 @@ namespace DontSleepWPF.Model
     internal class MainWindowModel : INotifyPropertyChanged
     {
         private KeyPressor _keyPressor;
-        private StopTimeChecker _stopTimeChecker;
+        private DateTime _stopTime;
 
         internal int Timeout 
         { 
@@ -27,51 +27,68 @@ namespace DontSleepWPF.Model
             }
         }
 
-        internal DateTime StopTime
-        {
-            get { return AppSettings.StopTime; }
-            set
-            {
-                if (AppSettings.StopTime != value)
-                {
-                    AppSettings.StopTime = value;
-                    AppSettings.Save();
-                }
-            }
-        }
+        internal Constants.KeyPressorStatus KeyPressorStatus { get; private set; }
+        public int StopTimePeriodValue { get; internal set; }
 
-        internal Constants.TaskStatus KeyPressorStatus { get; private set; }
+        public Constants.TimePeriod StopTimePeriodType { get; set; }
 
         public MainWindowModel()
         {
             _keyPressor = new KeyPressor(Timeout * 1000);
-            _keyPressor.TaskStatusUpdated += UpdateStatus;
-            _stopTimeChecker = new StopTimeChecker();
-            _stopTimeChecker.TaskStatusUpdated += ;
+            _keyPressor.TaskStatusUpdated += UpdateKeyPressorStatus;
+            _stopTime = DateTime.MinValue;
+            StopTimePeriodType = Constants.TimePeriod.Second;
+            StopTimePeriodValue = 0;
         }
 
-        internal void StartKeyPressor()
+        internal void EnableKeyPressor()
         {
             _keyPressor.Start();
         }
 
-        internal void StopKeyPressor()
+        internal void DisableKeyPressor()
         {
             _keyPressor.Stop();
         }
 
-        protected void UpdateStatus(Constants.TaskStatus status)
+        protected void UpdateKeyPressorStatus(Constants.KeyPressorStatus status)
         {
             KeyPressorStatus = status;
             OnPropertyChanged("KeyPressorStatus");
         }
 
-        protected void StartStopTimeChecker()
+        internal void EnableStopTimeChecker()
         {
-            _stopTimeChecker.Start(StopTime);
+            switch (StopTimePeriodType)
+            {
+                case Constants.TimePeriod.Second:
+                    _stopTime = DateTime.Now.AddSeconds(StopTimePeriodValue);
+                    break;
+                case Constants.TimePeriod.Minute:
+                    _stopTime = DateTime.Now.AddMinutes(StopTimePeriodValue);
+                    break;
+                case Constants.TimePeriod.Hour:
+                    _stopTime = DateTime.Now.AddHours(StopTimePeriodValue);
+                    break;
+                case Constants.TimePeriod.Day:
+                    _stopTime = DateTime.Now.AddDays(StopTimePeriodValue);
+                    break;
+                case Constants.TimePeriod.Week:
+                    _stopTime = DateTime.Now.AddDays(StopTimePeriodValue*7);
+                    break;
+                case Constants.TimePeriod.Month:
+                    _stopTime = DateTime.Now.AddMonths(StopTimePeriodValue);
+                    break;
+                default:
+                    break;
+            }            
+            _keyPressor.StopAtTime(_stopTime);
         }
 
-
+        internal void DisableStopTimeChecker()
+        {
+            _keyPressor.CancelStopTimer();
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")

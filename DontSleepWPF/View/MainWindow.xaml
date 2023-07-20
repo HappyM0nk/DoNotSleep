@@ -5,43 +5,50 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DontSleepWPF"
         mc:Ignorable="d"
-        Title="Don't Sleep" Height="150" Width="250" MinHeight="150" MinWidth="250"
-        ResizeMode="CanMinimize" MaxHeight="150" MaxWidth="250">
+        Title="Don't Sleep" Height="130" Width="210" MinHeight="130" MinWidth="210"
+        ResizeMode="CanMinimize" MaxHeight="130" MaxWidth="260">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
+            <!--<RowDefinition Height="25"/>-->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0.5*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"
                        Text="Timeout:" Margin="21,0,0,0"/>
-            <TextBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"                     
+        <TextBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                      Text="{Binding Path=Timeout, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            <TextBlock Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center"
-                       Text="s" Margin="5"/>
-        </Grid>
-        <Grid Grid.Row="1">
+        <TextBlock Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center"
+                       Text="seconds" Margin="5"/>
+
+        <CheckBox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                      Content="Stop after:" Margin="1,0,0,0" IsChecked="{Binding StopTimeSwitched, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        <TextBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,3"
+                     Text="{Binding Path=StopTimePeriodValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                     IsEnabled="{Binding IsStopTimePeriodEnabled, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+        <ComboBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5,2"                 
+                     ItemsSource="{Binding TimePeriods}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding SelectedStopTimePeriod}"
+                     IsEnabled="{Binding IsStopTimePeriodEnabled, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+        <Grid Grid.Row="2" Grid.ColumnSpan="3" Margin="5">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*"/>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
-            <CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                      Content="Stop after:" Margin="1,0,0,0" 
-                      IsEnabled="{Binding Path=StopSwitcherAvailable, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <TextBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,3"
-                     Text="{Binding Path=StopTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <ComboBox Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5,4"                 
-                     Text="{Binding Path=StopTimeType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <ToggleButton Grid.Row="2" Grid.Column="1" x:Name="Chkbx" 
+                          Style="{DynamicResource NiceToggleButton}" 
+                          Command="{Binding CheckedCommand}"
+                          CommandParameter="{Binding IsChecked,RelativeSource={RelativeSource Self}}"/>
         </Grid>
-        <Grid Grid.Row="2">
+        
+        
+        <!--<Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -60,8 +67,12 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" x:Name="StartBtn" Margin="5"
                     Command="{Binding Path=StartCommand}" Content="Start"/>
+            <ToggleButton Grid.Column="1" x:Name="Chkbx" 
+                          Style="{DynamicResource NiceToggleButton}" 
+                          Command="{Binding CheckedCommand}"
+                          CommandParameter="{Binding IsChecked,RelativeSource={RelativeSource Self}}"/>
             <Button Grid.Column="2" x:Name="StopBtn" Margin="5"
                     Command="{Binding Path=StopCommand}" Content="Stop"/>
-        </Grid>
+        </Grid>-->
     </Grid>
 </Window>

@@ -9,8 +9,6 @@ namespace DontSleepWPF
 {
     internal class Bootstarpper
     {
-        
-
         internal void Run()
         {
             AppSettings.Init();
